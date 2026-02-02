@@ -1,3 +1,4 @@
+import argparse
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -12,8 +13,15 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import confusion_matrix
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--n_trees", type=int, default=20, help="number of trees")
+
+args = parser.parse_args()
+n_trees = args.n_trees
+print(f"n_trees: {n_trees}")
+
 # os.chdir('/home/coder/work/ensae-reproductibilite-application')
-TrainingData = pd.read_csv("data/data.csv")
+TrainingData = pd.read_csv("data.csv")
 
 TrainingData.head()
 
@@ -21,10 +29,6 @@ TrainingData.head()
 TrainingData["Ticket"].str.split("/").str.len()
 
 TrainingData["Name"].str.split(",").str.len()
-
-N_TREES = 20
-MAX_DEPTH = None
-MAX_FEATURES = "sqrt"
 
 TrainingData.isnull().sum()
 
@@ -85,7 +89,7 @@ preprocessor = ColumnTransformer(
 pipe = Pipeline(
     [
         ("preprocessor", preprocessor),
-        ("classifier", RandomForestClassifier(n_estimators=20)),
+        ("classifier", RandomForestClassifier(n_estimators=n_trees)),
     ]
 )
 
@@ -107,7 +111,7 @@ jetonapi = "$trotskitueleski1917"
 # Random Forest
 
 
-# Ici demandons d'avoir 20 arbres
+# Ici demandons d'avoir n_trees arbres
 pipe.fit(X_train, y_train)
 
 
@@ -120,3 +124,7 @@ print(f"{rdmf_score:.1%} de bonnes réponses sur les données de test pour valid
 print(20 * "-")
 print("matrice de confusion")
 print(confusion_matrix(y_test, pipe.predict(X_test)))
+
+MAX_DEPTH = None
+MAX_FEATURES = "sqrt"
+
