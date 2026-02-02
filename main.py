@@ -4,8 +4,8 @@ import pandas as pd
 
 from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
-from build_pipeline import create_pipeline
-from train_evaluate import train, evaluate
+from src.pipeline.build_pipeline import create_pipeline
+from src.models.train_evaluate import train, evaluate
 
 # Load environment variables
 load_dotenv()
@@ -26,7 +26,7 @@ else:
 
 BASE_PATH = os.environ.get("BASE_PATH", "")
 
-TrainingData = pd.read_csv(os.path.join(BASE_PATH, "data.csv"))
+TrainingData = pd.read_csv(os.path.join(BASE_PATH, "raw", "data.csv"))
 
 # splitting samples
 y = TrainingData["Survived"]
@@ -36,8 +36,8 @@ X = TrainingData.drop("Survived", axis="columns")
 # une partie pour apprendre une partie pour regarder le score.
 # Prenons arbitrairement 10% du dataset en test et 90% pour l'apprentissage.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-pd.concat([X_train, y_train], axis=1).to_csv("train.csv")
-pd.concat([X_test, y_test], axis=1).to_csv("test.csv")
+pd.concat([X_train, y_train], axis=1).to_csv(os.path.join(BASE_PATH, "derived", "train.csv"))
+pd.concat([X_test, y_test], axis=1).to_csv(os.path.join(BASE_PATH, "derived", "test.csv"))
 
 pipe = create_pipeline(n_trees)
 pipe = train(pipe, X_train, y_train)
