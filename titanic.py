@@ -1,3 +1,4 @@
+import os
 import argparse
 import pandas as pd
 import seaborn as sns
@@ -12,6 +13,11 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import confusion_matrix
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--n_trees", type=int, default=20, help="number of trees")
@@ -19,6 +25,14 @@ parser.add_argument("--n_trees", type=int, default=20, help="number of trees")
 args = parser.parse_args()
 n_trees = args.n_trees
 print(f"n_trees: {n_trees}")
+
+
+jeton_api = os.environ.get("JETON_API", "")
+print("jeton_api")
+if jeton_api.startswith("$"):
+    print("API token has been configured properly")
+else:
+    print("API token has not been configured")
 
 # os.chdir('/home/coder/work/ensae-reproductibilite-application')
 TrainingData = pd.read_csv("data.csv")
