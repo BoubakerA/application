@@ -1,4 +1,5 @@
 import os
+import logging
 import argparse
 import pandas as pd
 
@@ -6,6 +7,16 @@ from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
 from src.pipeline.build_pipeline import create_pipeline
 from src.models.train_evaluate import train, evaluate
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("debug.log"),
+        logging.StreamHandler()
+    ]
+)
 
 # Load environment variables
 load_dotenv()
@@ -20,9 +31,9 @@ print(f"n_trees: {n_trees}")
 
 jeton_api = os.environ.get("JETON_API", "")
 if jeton_api.startswith("$"):
-    print("API token has been configured properly")
+    logging.info("API token has been configured properly")
 else:
-    print("API token has not been configured")
+    logging.info("API token has not been configured")
 
 BASE_PATH = os.environ.get("BASE_PATH", "")
 
@@ -49,7 +60,7 @@ pipe = train(pipe, X_train, y_train)
 y_pred = pipe.predict(X_test)
 rdmf_score, cm = evaluate(y_test, y_pred)
 
-print(f"{rdmf_score:.1%} de bonnes réponses sur les données de test pour validation")
-print(20 * "-")
-print("matrice de confusion")
-print(cm)
+logging.info(f"{rdmf_score:.1%} de bonnes réponses sur les données de test pour validation")
+logging.info(20 * "-")
+logging.info("matrice de confusion")
+logging.info(cm)
