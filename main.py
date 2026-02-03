@@ -1,7 +1,7 @@
 import os
+import duckdb
 import logging
 import argparse
-import pandas as pd
 
 from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
@@ -26,18 +26,23 @@ parser.add_argument("--n_trees", type=int, default=20, help="number of trees")
 
 args = parser.parse_args()
 n_trees = args.n_trees
-print(f"n_trees: {n_trees}")
+logging.info(f"n_trees: {n_trees}")
 
 
 jeton_api = os.environ.get("JETON_API", "")
+
 if jeton_api.startswith("$"):
     logging.info("API token has been configured properly")
 else:
     logging.info("API token has not been configured")
 
-BASE_PATH = os.environ.get("BASE_PATH", "")
+# chemins
+URL_RAW = os.getenv("URL_RAW")
 
-TrainingData = pd.read_csv(os.path.join(BASE_PATH, "raw", "data.csv"))
+data_path = os.environ.get("data_path", URL_RAW)
+
+query =f"SELECT * FROM read_parquet('{data_path}');"
+TrainingData = duckdb.sql(query).to_df()
 
 # splitting samples
 y = TrainingData["Survived"]
@@ -47,8 +52,8 @@ X = TrainingData.drop("Survived", axis="columns")
 # une partie pour apprendre une partie pour regarder le score.
 # Prenons arbitrairement 10% du dataset en test et 90% pour l'apprentissage.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-pd.concat([X_train, y_train], axis=1).to_csv(os.path.join(BASE_PATH, "derived", "train.csv"))
-pd.concat([X_test, y_test], axis=1).to_csv(os.path.join(BASE_PATH, "derived", "test.csv"))
+# pd.concat([X_train, y_train], axis=1).to_csv(os.path.join(BASE_PATH, "derived", "train.csv"))
+# pd.concat([X_test, y_test], axis=1).to_csv(os.path.join(BASE_PATH, "derived", "test.csv"))
 
 pipe = create_pipeline(n_trees)
 pipe = train(pipe, X_train, y_train)
