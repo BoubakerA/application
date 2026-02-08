@@ -5,8 +5,8 @@ import argparse
 
 from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
-from src.pipeline.build_pipeline import create_pipeline
-from src.models.train_evaluate import train, evaluate
+from titanicml.pipeline.build_pipeline import create_pipeline
+from titanicml.models.train_evaluate import train, evaluate
 
 
 logging.basicConfig(
