@@ -35,11 +35,11 @@ jobs:
       run: |
         python -m unittest tests/test_pipeline.py
 
-    - name: test main.py
+    - name: test train.py
       env:
         # Map GitHub Secrets to environment variables
         MY_BUCKET: ${{ secrets.MY_BUCKET }}
         CHEMIN_PARQUET: ${{ secrets.CHEMIN_PARQUET }}
         URL_RAW: ${{ secrets.URL_RAW }}
       run: |
-        python main.py
+        python train.py

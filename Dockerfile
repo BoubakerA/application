@@ -8,6 +8,6 @@ RUN apt-get -y update && \
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY src/ src/
-COPY main.py .
+COPY train.py .
 
-CMD ["python3", "main.py"]
+CMD ["python3", "train.py"]

@@ -2,6 +2,7 @@ import os
 import duckdb
 import logging
 import argparse
+import skops.io as sio
 
 from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
@@ -69,3 +70,6 @@ logging.info(f"{rdmf_score:.1%} de bonnes réponses sur les données de test pou
 logging.info(20 * "-")
 logging.info("matrice de confusion")
 logging.info(cm)
+
+logging.info("Saving model ...")
+obj = sio.dump(pipe, "model.skops")
