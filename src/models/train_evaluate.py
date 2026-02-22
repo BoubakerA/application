@@ -8,7 +8,8 @@ def train(pipe, X_train, y_train):
     return pipe
 
 
-def evaluate(y_test, y_pred):
+def evaluate_model(pipe, X_test, y_test):
+    y_pred = pipe.predict(X_test)
     rdmf_score = accuracy_score(y_test, y_pred)
     cm = confusion_matrix(y_test, y_pred)
     return rdmf_score, cm
