@@ -1,11 +1,11 @@
 """A simple API to expose our trained RandomForest model for Tutanic survival."""
 
 from fastapi import FastAPI
-import skops.io as sio
+from joblib import load
 import pandas as pd
 
-unknown_types = sio.get_untrusted_types(file="model.skops")
-model = sio.load("model.skops", trusted=unknown_types)
+
+model = load("model.joblib")
 
 app = FastAPI(
     title="Démonstration du modèle de prédiction de survie sur le Titanic",
