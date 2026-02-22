@@ -20,20 +20,25 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
+    - name: Install UV CLI
+      run: |
+        pip install --upgrade pip
+        pip install uv
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
-        pip install -r requirements.txt
+        uv sync
+        uv add flake8 pytest
 
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py') --fail-under=6
+        uv run pylint $(git ls-files '*.py') --fail-under=6
 
     - name: Test with pytest
       run: |
-        python -m unittest tests/test_pipeline.py
+        export PYTHONPATH=$PYTHONPATH:$(pwd)
+        uv run pytest tests/test_pipeline.py
 
     - name: test train.py
       env:
@@ -42,4 +47,4 @@ jobs:
         CHEMIN_PARQUET: ${{ secrets.CHEMIN_PARQUET }}
         URL_RAW: ${{ secrets.URL_RAW }}
       run: |
-        python train.py
+        uv run train.py
