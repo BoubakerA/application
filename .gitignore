@@ -5,3 +5,4 @@ __pycache__
 *.parquet
 .coverage
 model.joblib
+mlruns/*

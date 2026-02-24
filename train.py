@@ -3,6 +3,7 @@ Prediction de la survie d'un individu sur le Titanic
 """
 
 import os
+import mlflow
 from dotenv import load_dotenv
 import argparse
 from loguru import logger
@@ -24,6 +25,9 @@ load_dotenv()
 parser = argparse.ArgumentParser(description="Paramètres du random forest")
 parser.add_argument(
     "--n_trees", type=int, default=20, help="Nombre d'arbres"
+)
+parser.add_argument(
+    "--experiment_name", type=str, default="titanicml", help="MLFlow experiment name"
 )
 args = parser.parse_args()
 
@@ -102,3 +106,50 @@ logger.success(f"{score:.1%} de bonnes réponses sur les données de test pour v
 logger.debug(20 * "-")
 logger.info("Matrice de confusion")
 logger.debug(matrix)
+
+
+# LOGGING IN MLFLOW -----------------
+
+mlflow_server = os.getenv("MLFLOW_TRACKING_URI")
+
+logger.info(f"Saving experiment in {mlflow_server}")
+
+mlflow.set_tracking_uri(mlflow_server)
+mlflow.set_experiment(args.experiment_name)
+
+
+input_data_mlflow = mlflow.data.from_pandas(
+    TrainingData, source=data_path, name="Raw dataset"
+)
+training_data_mlflow = mlflow.data.from_pandas(
+    pd.concat([X_train, y_train], axis=1), source=data_path, name="Training data"
+)
+
+
+with mlflow.start_run():
+
+    # Log datasets
+    mlflow.log_input(input_data_mlflow, context="raw")
+    mlflow.log_input(training_data_mlflow, context="raw")
+
+    # Log parameters
+    mlflow.log_param("n_trees", n_trees)
+    mlflow.log_param("max_depth", MAX_DEPTH)
+    mlflow.log_param("max_features", MAX_FEATURES)
+
+    # Log best hyperparameters from GridSearchCV
+    best_params = pipe_cross_validation.best_params_
+    for param, value in best_params.items():
+        mlflow.log_param(param, value)
+
+    # Log metrics
+    mlflow.log_metric("accuracy", score)
+
+    # Log confusion matrix as an artifact
+    matrix_path = "confusion_matrix.txt"
+    with open(matrix_path, "w") as f:
+        f.write(str(matrix))
+    mlflow.log_artifact(matrix_path)
+
+    # Log model
+    mlflow.sklearn.log_model(pipe, "model")
