@@ -6,3 +6,9 @@ __pycache__
 .coverage
 model.joblib
 mlruns/*
+/.quarto/
+*.html
+*_files
+_site/
+
+**/*.quarto_ipynb
